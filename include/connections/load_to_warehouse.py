@@ -78,7 +78,8 @@ def load_leads_to_warehouse(**context):
             Country VARCHAR(100),
             isSalesforce BOOLEAN DEFAULT FALSE,
             isSalesLT BOOLEAN DEFAULT FALSE,
-            DataSourcePriority VARCHAR(20),
+            Source VARCHAR(20),
+            SourceId VARCHAR(255), 
             CreatedDate DATETIME,
             ModifiedDate DATETIME,
             UNIQUE KEY idx_email (Email)
@@ -105,7 +106,8 @@ def load_leads_to_warehouse(**context):
             Country VARCHAR(100),
             isSalesforce BOOLEAN DEFAULT FALSE,
             isSalesLT BOOLEAN DEFAULT FALSE,
-            DataSourcePriority VARCHAR(20),
+            Source VARCHAR(20),
+            SourceId VARCHAR(255), 
             CreatedDate DATETIME,
             ModifiedDate DATETIME,
             PRIMARY KEY (Email)
@@ -123,7 +125,7 @@ def load_leads_to_warehouse(**context):
         required_columns = [
             'Email', 'FirstName', 'LastName', 'FullName', 'Phone', 'JobTitle',
             'Address', 'City', 'State', 'PostalCode', 'Country',
-            'isSalesforce', 'isSalesLT', 'DataSourcePriority',
+            'isSalesforce', 'isSalesLT', 'Source', 'SourceId',
             'CreatedDate', 'ModifiedDate'
         ]
         
@@ -174,7 +176,7 @@ def load_leads_to_warehouse(**context):
         # Get counts by source
         source_counts = {}
         for priority in ['Both', 'Salesforce', 'ERP']:
-            cursor.execute(f"SELECT COUNT(*) FROM Leadtest WHERE DataSourcePriority = '{priority}'")
+            cursor.execute(f"SELECT COUNT(*) FROM Leadtest WHERE Source = '{priority}'")
             source_counts[priority] = cursor.fetchone()[0]
         
         # Commit the transaction

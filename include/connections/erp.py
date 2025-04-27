@@ -113,7 +113,7 @@ def extract_erp_customer_data(date,host,port,database,user,password):
         
         # Add source flag
         df_comprehensive['isSalesLT'] = True
-        df_comprehensive['DataSourcePriority'] = 'ERP'
+        df_comprehensive['Source'] = 'ERP'
         
         # FIX: Add extraction date to all rows - convert execution_date to string first
         extracted_date_str = execution_date.strftime('%Y-%m-%d %H:%M:%S')

@@ -71,7 +71,7 @@ def combine_data_for_leads_table(**context):
         if not sf_df.empty:
             sf_df['isSalesforce'] = True
             sf_df['isSalesLT'] = False
-            sf_df['DataSourcePriority'] = 'Salesforce'
+            sf_df['Source'] = 'Salesforce'
             
             # Ensure DoNotCall filter
             if 'DoNotCall' in sf_df.columns:
@@ -81,7 +81,7 @@ def combine_data_for_leads_table(**context):
         if not erp_df.empty:
             erp_df['isSalesforce'] = False
             erp_df['isSalesLT'] = True
-            erp_df['DataSourcePriority'] = 'ERP'
+            erp_df['Source'] = 'ERP'
         
         # Ensure we have proper email columns
         sf_email_col = next((col for col in sf_df.columns if col.lower() == 'email'), None) if not sf_df.empty else None
@@ -215,7 +215,13 @@ def combine_data_for_leads_table(**context):
             # Set both flags to True
             combined_record['isSalesforce'] = True
             combined_record['isSalesLT'] = True
-            combined_record['DataSourcePriority'] = 'Both'
+            combined_record['Source'] = 'Both'
+
+                # For SourceId, use Salesforce Id (priority)
+            if 'Id' in sf_record and sf_record['Id']:
+                combined_record['SourceId'] = sf_record['Id']
+            elif 'CustomerID' in erp_record and erp_record['CustomerID']:
+                combined_record['SourceId'] = f"ERP-{erp_record['CustomerID']}"
             
             # For any missing fields in SF, supplement from ERP
             for field in erp_record:
@@ -231,7 +237,12 @@ def combine_data_for_leads_table(**context):
             sf_record = sf_df.loc[email].to_dict() if isinstance(sf_df.loc[email], pd.Series) else sf_df.loc[email].iloc[0].to_dict()
             sf_record['isSalesforce'] = True
             sf_record['isSalesLT'] = False
-            sf_record['DataSourcePriority'] = 'Salesforce'
+            sf_record['Source'] = 'Salesforce'
+
+            # Use Salesforce Id as SourceId
+            if 'Id' in sf_record and sf_record['Id']:
+                sf_record['SourceId'] = sf_record['Id']
+
             # Add email back as a field
             sf_record['Email'] = email
             combined_records.append(sf_record)
@@ -241,7 +252,12 @@ def combine_data_for_leads_table(**context):
             erp_record = erp_df.loc[email].to_dict() if isinstance(erp_df.loc[email], pd.Series) else erp_df.loc[email].iloc[0].to_dict()
             erp_record['isSalesforce'] = False
             erp_record['isSalesLT'] = True
-            erp_record['DataSourcePriority'] = 'ERP'
+            erp_record['Source'] = 'ERP'
+
+            # Use ERP CustomerID as SourceId, with prefix to distinguish from Salesforce IDs
+            if 'CustomerID' in erp_record and erp_record['CustomerID']:
+                erp_record['SourceId'] = f"ERP-{erp_record['CustomerID']}"
+
             # Add email back as a field
             erp_record['Email'] = email
             combined_records.append(erp_record)
@@ -266,9 +282,9 @@ def combine_data_for_leads_table(**context):
                 
                 # Keep records with priority: Both > Salesforce > ERP
                 def priority_order(row):
-                    if row['DataSourcePriority'] == 'Both':
+                    if row['Source'] == 'Both':
                         return 0
-                    elif row['DataSourcePriority'] == 'Salesforce':
+                    elif row['Source'] == 'Salesforce':
                         return 1
                     else:
                         return 2
