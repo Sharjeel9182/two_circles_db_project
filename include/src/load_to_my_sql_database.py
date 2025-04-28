@@ -32,7 +32,7 @@ def load_leads_to_warehouse(**context):
         ti = context['ti']
         
         # Retrieve combined data from upstream task
-        records = ti.xcom_pull(task_ids='combine_data')
+        records = ti.xcom_pull(task_ids='combine_sources_data')
         
         if not records:
             logger.warning("No records to load to the warehouse")

@@ -7,7 +7,7 @@ def validate_leads_data(**context):
     import logging
     
     ti = context['ti']
-    records = ti.xcom_pull(task_ids='combine_data')
+    records = ti.xcom_pull(task_ids='combine_sources_data')
     
     logger = logging.getLogger(__name__)
     logger.info(f"Validating {len(records)} lead records")

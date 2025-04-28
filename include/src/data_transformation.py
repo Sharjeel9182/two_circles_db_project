@@ -32,7 +32,7 @@ def combine_data_for_leads_table(**context):
         ti = context['ti']
         
         # Retrieve dataframes from upstream tasks with detailed logging
-        sf_df = ti.xcom_pull(task_ids='fetch_salesforce_data')
+        sf_df = ti.xcom_pull(task_ids='extract_salesforce_data')
         erp_df = ti.xcom_pull(task_ids='extract_erp_data')
         
         logger.info(f"Salesforce data type: {type(sf_df)}")
