@@ -18,7 +18,6 @@ def extract_erp_customer_data(date,host,port,database,user,password):
     import mysql.connector
     import pandas as pd
     import logging
-    from datetime import datetime
     
     # Set up logging
     logger = logging.getLogger(__name__)
@@ -41,10 +40,6 @@ def extract_erp_customer_data(date,host,port,database,user,password):
         
         # Create a cursor
         cursor = conn.cursor(dictionary=True)
-        
-        # For incremental loads, we would get the last successful run timestamp
-        # last_run_date = context.get('params', {}).get('last_successful_run', '1900-01-01')
-        # current_run_date = execution_date.strftime('%Y-%m-%d %H:%M:%S')
         
         # Comprehensive query joining all relevant tables for complete contact information
         comprehensive_query = """

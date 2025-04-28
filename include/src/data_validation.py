@@ -12,7 +12,6 @@ def validate_leads_data(**context):
     logger = logging.getLogger(__name__)
     logger.info(f"Validating {len(records)} lead records")
     
-    # Create DataFrame for easier analysis
     df = pd.DataFrame(records)
     
     # Log columns to debug

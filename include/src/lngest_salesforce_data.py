@@ -25,7 +25,6 @@ def fetch_salesforce_data(client_id, client_secret, username, password, selected
     if not access_token or not instance_url:
         raise Exception("Failed to authenticate with Salesforce API.")
 
-    # 2. Describe Contact Object (Optional: for schema inspection)
     describe_url = f"{instance_url}/services/data/v51.0/sobjects/Contact/describe"
     headers = {"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"}
 

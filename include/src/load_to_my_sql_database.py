@@ -68,14 +68,14 @@ def load_leads_to_warehouse(**context):
         
         # Create Leads table if it doesn't exist
         drop_table_if_exists ="""
-        DROP TABLE IF EXISTS Leadtest;
+        DROP TABLE IF EXISTS Leads;
         """
         cursor.execute(drop_table_if_exists)
-        logger.info("Leadtest table dropped")
+        logger.info("Leads table dropped")
 
         
         create_table_sql = """
-        CREATE TABLE Leadtest (
+        CREATE TABLE Leads (
             LeadID INT AUTO_INCREMENT PRIMARY KEY,
             Email VARCHAR(255) NOT NULL,
             FirstName VARCHAR(100),
@@ -97,7 +97,7 @@ def load_leads_to_warehouse(**context):
         )
         """
         cursor.execute(create_table_sql)
-        logger.info("Leadtest table created or verified")
+        logger.info("Leads table created or verified")
         
         # Create temporary table for the staging operation
         drop_temp_table = "DROP TABLE IF EXISTS TempLeads"
@@ -160,7 +160,7 @@ def load_leads_to_warehouse(**context):
         
         # Perform the upsert from temporary to target table
         upsert_sql = f"""
-        INSERT INTO Leadtest ({', '.join(load_columns)})
+        INSERT INTO Leads ({', '.join(load_columns)})
         SELECT {', '.join(load_columns)}
         FROM TempLeads
         ON DUPLICATE KEY UPDATE
@@ -181,13 +181,13 @@ def load_leads_to_warehouse(**context):
         affected_rows = cursor.rowcount
         
         # Count the records in leads table for reporting
-        cursor.execute("SELECT COUNT(*) FROM Leadtest")
+        cursor.execute("SELECT COUNT(*) FROM Leads")
         total_leads = cursor.fetchone()[0]
         
         # Get counts by source
         source_counts = {}
         for priority in ['Both', 'Salesforce', 'ERP']:
-            cursor.execute(f"SELECT COUNT(*) FROM Leadtest WHERE Source = '{priority}'")
+            cursor.execute(f"SELECT COUNT(*) FROM Leads WHERE Source = '{priority}'")
             source_counts[priority] = cursor.fetchone()[0]
         
         # Commit the transaction

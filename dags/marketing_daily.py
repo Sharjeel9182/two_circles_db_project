@@ -59,7 +59,6 @@ def pipeline(**context):
         provide_context=True,
     )
 
-    # Task dependencies (example)
     [fetch_data_task >> extract_erp_task] >> combine_data_task >> data_validation >> load_data 
 
 # Define the DAG

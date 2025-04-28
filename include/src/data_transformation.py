@@ -295,7 +295,7 @@ def combine_data_for_leads_table(**context):
                 
                 logger.info(f"After final deduplication: {len(final_df)} records")
         
-        logger.info(f"Successfully created unified Leads table with {len(final_df)} records")
+        logger.info(f"Successfully combined data from Salesforce and ERP to be inserted into Leads table with {len(final_df)} records")
         
         # Convert all datetime columns to strings to avoid serialization issues
         for column in final_df.columns:
