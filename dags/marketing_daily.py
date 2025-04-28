@@ -2,7 +2,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from include.src.lngest_salesforce_data import fetch_salesforce_data
 from include.src.Ingest_sales_order_erp_data import extract_erp_customer_data
-from include.src.combine_data_forces import combine_data_for_leads_table
+from include.src.data_transformation import combine_data_for_leads_table
 from include.src.data_validation import validate_leads_data
 from include.src.load_to_my_sql_database import load_leads_to_warehouse
 from datetime import datetime
@@ -13,8 +13,8 @@ conf.set('core', 'enable_xcom_pickling', 'True')
 
 def pipeline(**context):
     date = context.get('execution_date', datetime.now())
-    fetch_data_task = PythonOperator(
-        task_id='fetch_salesforce_data',
+    extract_salesforce_data = PythonOperator(
+        task_id='extract_salesforce_data',
         python_callable=fetch_salesforce_data,
         op_args=[
             "3MVG9ux34Ig8G5epaMPqbA1E25OpLuKGuGcWZixMzgV6myFvvKoIQnGrMY5mg9pTNHPBWj9GgJNuwD0TAIEIy",  # client_id
@@ -26,7 +26,7 @@ def pipeline(**context):
         ]
     )
 
-    extract_erp_task = PythonOperator(
+    extract_erp_data = PythonOperator(
     task_id='extract_erp_data',
     python_callable=extract_erp_customer_data,
     op_args =[       
@@ -41,8 +41,8 @@ def pipeline(**context):
     dag=dag,
     )
 
-    combine_data_task = PythonOperator(
-        task_id='combine_data',
+    combine_data_sources = PythonOperator(
+        task_id='combine_sources_data',
         python_callable=combine_data_for_leads_table,
         provide_context=True,
     )
@@ -53,13 +53,13 @@ def pipeline(**context):
         provide_context=True,
     )
 
-    load_data = PythonOperator(
+    load_data_to_warehouse = PythonOperator(
         task_id='load_data_to_warehouse',
         python_callable=load_leads_to_warehouse,
         provide_context=True,
     )
 
-    [fetch_data_task >> extract_erp_task] >> combine_data_task >> data_validation >> load_data 
+    [extract_salesforce_data >> extract_erp_data] >> combine_data_sources >> data_validation >> load_data_to_warehouse 
 
 # Define the DAG
 with DAG(

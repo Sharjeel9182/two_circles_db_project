@@ -66,16 +66,8 @@ def load_leads_to_warehouse(**context):
         
         cursor = conn.cursor()
         
-        # Create Leads table if it doesn't exist
-        drop_table_if_exists ="""
-        DROP TABLE IF EXISTS Leads;
-        """
-        cursor.execute(drop_table_if_exists)
-        logger.info("Leads table dropped")
-
-        
         create_table_sql = """
-        CREATE TABLE Leads (
+        CREATE TABLE IF NOT EXISTS Leads (
             LeadID INT AUTO_INCREMENT PRIMARY KEY,
             Email VARCHAR(255) NOT NULL,
             FirstName VARCHAR(100),
