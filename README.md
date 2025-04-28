@@ -1,48 +1,98 @@
-Overview
-========
+# Setup Guide for Two Circles ETL
 
-Welcome to Astronomer! This project was generated after you ran 'astro dev init' using the Astronomer CLI. This readme describes the contents of the project, as well as how to run Apache Airflow on your local machine.
+This guide provides detailed step-by-step instructions for setting up and running the Two Circles ETL pipeline.
 
-Project Contents
-================
+## Prerequisites Installation
 
-Your Astro project contains the following files and folders:
+### 1. Install Docker and Docker Compose
 
-- dags: This folder contains the Python files for your Airflow DAGs. By default, this directory includes one example DAG:
-    - `example_astronauts`: This DAG shows a simple ETL pipeline example that queries the list of astronauts currently in space from the Open Notify API and prints a statement for each astronaut. The DAG uses the TaskFlow API to define tasks in Python, and dynamic task mapping to dynamically print a statement for each astronaut. For more on how this DAG works, see our [Getting started tutorial](https://www.astronomer.io/docs/learn/get-started-with-airflow).
-- Dockerfile: This file contains a versioned Astro Runtime Docker image that provides a differentiated Airflow experience. If you want to execute other commands or overrides at runtime, specify them here.
-- include: This folder contains any additional files that you want to include as part of your project. It is empty by default.
-- packages.txt: Install OS-level packages needed for your project by adding them to this file. It is empty by default.
-- requirements.txt: Install Python packages needed for your project by adding them to this file. It is empty by default.
-- plugins: Add custom or community plugins for your project to this file. It is empty by default.
-- airflow_settings.yaml: Use this local-only file to specify Airflow Connections, Variables, and Pools instead of entering them in the Airflow UI as you develop DAGs in this project.
+The Astronomer platform runs on Docker, so you'll need Docker and Docker Compose installed.
 
-Deploy Your Project Locally
-===========================
+**For Windows:**
+- Download and install Docker Desktop from [here](https://www.docker.com/products/docker-desktop)
+- Docker Desktop includes Docker Compose
 
-1. Start Airflow on your local machine by running 'astro dev start'.
+**For Mac:**
+- Download and install Docker Desktop from [here](https://www.docker.com/products/docker-desktop)
+- Docker Desktop includes Docker Compose
 
-This command will spin up 4 Docker containers on your machine, each for a different Airflow component:
+**For Linux:**
+- Follow the installation instructions for your distribution [here](https://docs.docker.com/engine/install/)
+- Install Docker Compose separately by following [these instructions](https://docs.docker.com/compose/install/)
 
-- Postgres: Airflow's Metadata Database
-- Webserver: The Airflow component responsible for rendering the Airflow UI
-- Scheduler: The Airflow component responsible for monitoring and triggering tasks
-- Triggerer: The Airflow component responsible for triggering deferred tasks
+### 2. Install Astronomer CLI
 
-2. Verify that all 4 Docker containers were created by running 'docker ps'.
+The Astronomer CLI helps manage your Airflow projects.
 
-Note: Running 'astro dev start' will start your project with the Airflow Webserver exposed at port 8080 and Postgres exposed at port 5432. If you already have either of those ports allocated, you can either [stop your existing Docker containers or change the port](https://www.astronomer.io/docs/astro/cli/troubleshoot-locally#ports-are-not-available-for-my-local-airflow-webserver).
+**For all platforms:**
 
-3. Access the Airflow UI for your local Airflow project. To do so, go to http://localhost:8080/ and log in with 'admin' for both your Username and Password.
+```bash
+# Install using curl
+curl -sSL https://install.astronomer.io | sudo bash
+```
 
-You should also be able to access your Postgres Database at 'localhost:5432/postgres'.
+**Alternative method:**
 
-Deploy Your Project to Astronomer
-=================================
+```bash
+# Using pip
+pip install astronomer-cli
+```
 
-If you have an Astronomer account, pushing code to a Deployment on Astronomer is simple. For deploying instructions, refer to Astronomer documentation: https://www.astronomer.io/docs/astro/deploy-code/
+Verify the installation:
 
-Contact
-=======
+```bash
+astro version
+```
 
-The Astronomer CLI is maintained with love by the Astronomer team. To report a bug or suggest a change, reach out to our support.
+## Project Setup
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Sharjeel9182/two_circles_db_project.git
+cd two-circles-etl
+```
+
+### 2. Start Airflow
+
+From the project root directory:
+
+```bash
+astro dev start
+```
+
+This command:
+- Builds the Docker image with all dependencies
+- Creates and starts containers for each Airflow component
+- Mounts your local code to the containers
+
+The first time you run this, it may take a few minutes to download and build everything.
+
+### 3. Access the Airflow UI
+
+- Open your browser and go to [http://localhost:8080](http://localhost:8080)
+- Login with the default credentials:
+  - Username: `admin`
+  - Password: `admin`
+
+## Running the ETL Pipeline
+
+### Option 1: Via Airflow UI
+
+1. Navigate to the DAGs page in the Airflow UI
+2. Find the `two_circles_data_pipeline` DAG
+3. Trigger the DAG by clicking the "play" button (▶️)
+4. Monitor the execution in the "Graph" or "Grid" view
+
+### Option 2: Via Command Line
+
+You can also trigger the DAG via the Airflow CLI:
+
+```bash
+# Connect to the Airflow webserver container
+docker exec -it $(docker ps | grep webserver | awk '{print $1}') bash
+
+# Trigger the DAG
+airflow dags trigger two_circles_data_pipeline
+```
+
