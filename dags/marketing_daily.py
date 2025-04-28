@@ -1,12 +1,10 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from include.connections.salesforce import fetch_salesforce_data
-from include.connections.erp import extract_erp_customer_data
-from include.connections.combine_data import combine_data_for_leads_table
-from include.connections.validation import validate_leads_data
-from include.connections.permissions import check_warehouse_permissions
-from include.connections.explore import  inspect_leads_table
-from include.connections.load_to_warehouse import load_leads_to_warehouse
+from include.src.lngest_salesforce_data import fetch_salesforce_data
+from include.src.Ingest_sales_order_erp_data import extract_erp_customer_data
+from include.src.combine_data_forces import combine_data_for_leads_table
+from include.src.data_validation import validate_leads_data
+from include.src.load_to_my_sql_database import load_leads_to_warehouse
 from datetime import datetime
 from airflow.configuration import conf
 
@@ -66,7 +64,7 @@ def pipeline(**context):
 
 # Define the DAG
 with DAG(
-    dag_id='two_circle_data_pipeline',
+    dag_id='two_circles_data_pipeline',
     start_date=datetime(2025, 1, 1),
     schedule_interval=None,  # No schedule
     catchup=False,

@@ -18,21 +18,21 @@ def validate_leads_data(**context):
     # Log columns to debug
     logger.info(f"Columns in the dataframe: {df.columns.tolist()}")
 
-    # Count records by DataSourcePriority
-    if 'DataSourcePriority' in df.columns:
-        priority_counts = df['DataSourcePriority'].value_counts().to_dict()
-        logger.info("Records by DataSourcePriority:")
+    # Count records by Source
+    if 'Source' in df.columns:
+        priority_counts = df['Source'].value_counts().to_dict()
+        logger.info("Records by Source:")
         for priority, count in priority_counts.items():
             logger.info(f"  - {priority}: {count} records")
         
         # Get percentages for better understanding
         total_records = len(df)
-        logger.info("Distribution by DataSourcePriority:")
+        logger.info("Distribution by Source:")
         for priority, count in priority_counts.items():
             percentage = (count / total_records) * 100
             logger.info(f"  - {priority}: {percentage:.2f}%")
     else:
-        logger.warning("DataSourcePriority column not found in the data")
+        logger.warning("Source column not found in the data")
     
     # Check for email column with different case
     email_columns = [col for col in df.columns if col.lower() == 'email']
@@ -75,7 +75,7 @@ def validate_leads_data(**context):
             for i, record in enumerate(sample_records):
                 logger.warning(f"  Record {i+1} for {email}:")
                 for key, value in record.items():
-                    if key in ['CustomerID', 'FirstName', 'LastName', email_column, 'isSalesLT', 'DataSourcePriority']:
+                    if key in ['CustomerID', 'FirstName', 'LastName', email_column, 'isSalesLT', 'Source']:
                         logger.warning(f"    {key}: {value}")
     
     # Check for missing values in critical fields

@@ -32,11 +32,6 @@ def fetch_salesforce_data(client_id, client_secret, username, password, selected
     describe_response = requests.get(describe_url, headers=headers)
     schema = describe_response.json()
 
-    # # Print schema fields (for debugging or inspection)
-    # print("\nContact Schema Fields:")
-    # for field in schema["fields"]:
-    #     print(f"{field['name']} ({field['type']}): {field['label']}")
-
     # 3. Build the SOQL query
     field_list = ",".join(selected_columns)  # Convert list of columns into a comma-separated string
     query = f"SELECT {field_list} FROM Contact WHERE DoNotCall != true"  # Ignore records where DoNotCall = true
