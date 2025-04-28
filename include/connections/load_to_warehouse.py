@@ -40,6 +40,19 @@ def load_leads_to_warehouse(**context):
         
         logger.info(f"Retrieved {len(records)} records for loading")
         
+        # Filter out records with null emails
+        valid_records = [record for record in records if record.get('Email') is not None and record.get('Email').strip() != '']
+        
+        skipped_records = len(records) - len(valid_records)
+        if skipped_records > 0:
+            logger.warning(f"Skipped {skipped_records} records with null or empty email addresses")
+        
+        if not valid_records:
+            logger.warning("No valid records with email addresses to load to the warehouse")
+            return {"status": "warning", "records_processed": 0, "records_skipped": skipped_records, "message": "No valid records with email addresses to process"}
+        
+        logger.info(f"Proceeding with {len(valid_records)} valid records for loading")
+        
         # Connect to data warehouse
         logger.info("Connecting to data warehouse...")
         conn = mysql.connector.connect(
@@ -54,8 +67,6 @@ def load_leads_to_warehouse(**context):
         cursor = conn.cursor()
         
         # Create Leads table if it doesn't exist
-
-
         drop_table_if_exists ="""
         DROP TABLE IF EXISTS Leadtest;
         """
@@ -118,7 +129,7 @@ def load_leads_to_warehouse(**context):
         
         # Prepare the data for loading
         all_columns = set()
-        for record in records:
+        for record in valid_records:  # Use valid_records instead of records
             all_columns.update(record.keys())
         
         # Identify required columns for the database
@@ -139,7 +150,7 @@ def load_leads_to_warehouse(**context):
         
         # Prepare the data
         load_data = []
-        for record in records:
+        for record in valid_records:  # Use valid_records instead of records
             row = [record.get(col) for col in load_columns]
             load_data.append(row)
         
@@ -191,7 +202,8 @@ def load_leads_to_warehouse(**context):
         # Return operation statistics
         return {
             "status": "success",
-            "records_processed": len(records),
+            "records_processed": len(valid_records),
+            "records_skipped": skipped_records,
             "records_affected": affected_rows,
             "total_leads": total_leads,
             "source_counts": source_counts
