@@ -22,20 +22,18 @@ The Astronomer platform runs on Docker, so you'll need Docker and Docker Compose
 
 ### 2. Install Astronomer CLI
 
-The Astronomer CLI helps manage your Airflow projects.
+- Instructions for installing Astro CLI for both Mac and Windows (https://www.astronomer.io/docs/astro/cli/install-cli/)
 
-**For all platforms:**
+**For Windows:**
 
 ```bash
-# Install using curl
-curl -sSL https://install.astronomer.io | sudo bash
+winget install -e --id Astronomer.Astro
 ```
 
-**Alternative method:**
+**For Mac:**
 
 ```bash
-# Using pip
-pip install astronomer-cli
+brew install astro
 ```
 
 Verify the installation:
@@ -48,9 +46,10 @@ astro version
 
 ### 1. Clone the repository
 
+Link to Github repository: https://github.com/Sharjeel9182/two_circles_db_project
+
 ```bash
 git clone https://github.com/Sharjeel9182/two_circles_db_project.git
-cd two-circles-etl
 ```
 
 ### 2. Start Airflow
@@ -70,29 +69,15 @@ The first time you run this, it may take a few minutes to download and build eve
 
 ### 3. Access the Airflow UI
 
-- Open your browser and go to [http://localhost:8080](http://localhost:8080)
+- Open your browser and go to [http://localhost:8080]
 - Login with the default credentials:
   - Username: `admin`
   - Password: `admin`
 
 ## Running the ETL Pipeline
 
-### Option 1: Via Airflow UI
-
 1. Navigate to the DAGs page in the Airflow UI
 2. Find the `two_circles_data_pipeline` DAG
 3. Trigger the DAG by clicking the "play" button (▶️)
 4. Monitor the execution in the "Graph" or "Grid" view
-
-### Option 2: Via Command Line
-
-You can also trigger the DAG via the Airflow CLI:
-
-```bash
-# Connect to the Airflow webserver container
-docker exec -it $(docker ps | grep webserver | awk '{print $1}') bash
-
-# Trigger the DAG
-airflow dags trigger two_circles_data_pipeline
-```
 
